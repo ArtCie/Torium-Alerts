@@ -1,10 +1,9 @@
-from ip_tracker import IpTracker
-from discord_manager import DiscordManager
-from cloud_watch_manager import CloudWatchManager
+from aws_logs_managers.aws_log_manager import AwsLogManager
 
 
-class DbAlertsManager:
-    def __init__(self, cloud_watch_manager: CloudWatchManager, ip_tracker: IpTracker, discord_manager: DiscordManager):
+class DbAlertsManager(AwsLogManager):
+    def __init__(self):
+        super().__init__()
         self.DISCORD_LINK = 'https://discord.com/api/webhooks/1044294790516318229' \
                             '/M0v6CLui8b2z6PBpXP24xuvoChBxOrlIZ_u34PRyj0djPuLCcy8vlDI_IQb87rbgTzjc'
         self.LOG_GROUP = '/aws/rds/instance/toddy-test/postgresql'
@@ -12,9 +11,6 @@ class DbAlertsManager:
             | parse @message "* * *:*:*:[*]:*:*" as date, time, timezone, ipaddress, dbuser, pid, type, text
             | display date, time, timezone, ipaddress, dbuser, pid, type, text"""
         self.TITLE = "**DATABASE ERROR**"
-        self.ip_tracker = ip_tracker
-        self.discord_manager = discord_manager
-        self.cloud_watch_manager = cloud_watch_manager
 
     def process_db_errors(self):
         database_logs = self.cloud_watch_manager.get_logs(self.LOG_GROUP, self.QUERY_STRING)
