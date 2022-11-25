@@ -39,5 +39,5 @@ class LambdaAlertsManager(AwsLogManager):
 
     @staticmethod
     def _look_for_critical_words(message):
-        return re.search(r'(LINE|CRITICAL|ERROR|WARNING)', message.upper())
+        return '[ERROR]' in message.upper()
 
