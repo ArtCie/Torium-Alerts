@@ -11,14 +11,14 @@ class BeanstalkAlertsManager(AwsLogManager):
         self.LOG_GROUP = "/aws/elasticbeanstalk/Torium-api/var/log/web.stdout.log"
         self.QUERY_STRING = "fields @message"
         self.TITLE = "**TORIUM API ALERT**"
+        self.errors = []
 
     def process_beanstalk_errors(self):
         beanstalk_errors = self.cloud_watch_manager.get_logs(self.LOG_GROUP, self.QUERY_STRING)
-        errors = self._find_errors(beanstalk_errors)
-        self.discord_manager.send_discord_messages(errors, self.DISCORD_LINK)
+        self._find_errors(beanstalk_errors)
+        self.discord_manager.send_discord_messages(self.errors, self.DISCORD_LINK)
 
     def _find_errors(self, beanstalk_errors: dict):
-        errors = []
         if beanstalk_errors.get('results'):
             local_index = 0
             beanstalk_errors = beanstalk_errors['results'][::-1]
@@ -26,10 +26,8 @@ class BeanstalkAlertsManager(AwsLogManager):
             while local_index < limit_index:
                 if self._look_for_critical_words(beanstalk_errors[local_index][0]['value']):
                     error_stream, local_index = self._collect_error_stream(local_index, limit_index, beanstalk_errors)
-                    errors.append(self.discord_manager.prepare_discord_message(self.TITLE, error_stream))
+                    self.errors.append(self.discord_manager.prepare_discord_message(self.TITLE, error_stream))
                 local_index += 1
-        return errors
-
     @staticmethod
     def _look_for_critical_words(message):
         return re.search(r'(LINE|CRITICAL|ERROR|WARNING)', message.upper())

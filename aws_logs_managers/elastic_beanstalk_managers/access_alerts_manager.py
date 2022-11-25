@@ -11,20 +11,19 @@ class AccessAlertsManager(AwsLogManager):
         self.QUERY_STRING = """fields @message
  | parse @message '* - - [*] "*" * *' as ip, date, method, code
  | display ip, date, method, rest, code"""
+        self.errors = []
 
     def process_access_errors(self):
         access_logs = self.cloud_watch_manager.get_logs(self.LOG_GROUP, self.QUERY_STRING)
-        errors = self._find_errors(access_logs)
-        self.discord_manager.send_discord_messages(errors, self.DISCORD_LINK)
+        self._find_errors(access_logs)
+        self.discord_manager.send_discord_messages(self.errors, self.DISCORD_LINK)
 
     def _find_errors(self, access_logs: dict):
         if access_logs.get('results'):
-            errors = []
             for log in access_logs['results']:
                 if self._check_message_code(log[3]['value']):
                     description = self._build_description(log)
-                    errors.append(self.discord_manager.prepare_discord_message(self.TITLE, description))
-            return errors
+                    self.errors.append(self.discord_manager.prepare_discord_message(self.TITLE, description))
 
     @staticmethod
     def _check_message_code(code):

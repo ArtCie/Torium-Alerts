@@ -1,3 +1,6 @@
+import datetime
+from threading import Thread
+
 from aws_logs_managers.db_alerts_manager import DbAlertsManager
 from aws_logs_managers.lambda_alerts_manager import LambdaAlertsManager
 from aws_logs_managers.elastic_beanstalk_managers.health_alerts_manager import HealthAlertsManager
@@ -14,8 +17,12 @@ class AlertsManager:
         self._beanstalk_alerts_manager = BeanstalkAlertsManager()
 
     def process(self):
-        self._db_alerts_manager.process_db_errors()
-        self._lambda_alerts_manager.process_lambda_errors()
-        self._health_alerts_manager.process_health_errors()
-        self._access_alerts_manager.process_access_errors()
-        self._beanstalk_alerts_manager.process_beanstalk_errors()
+        threads = [
+            Thread(target=self._db_alerts_manager.process_db_errors),
+            Thread(target=self._lambda_alerts_manager.process_lambda_errors),
+            Thread(target=self._health_alerts_manager.process_health_errors),
+            Thread(target=self._access_alerts_manager.process_access_errors),
+            Thread(target=self._beanstalk_alerts_manager.process_beanstalk_errors),
+        ]
+        [thread.start() for thread in threads]
+        [thread.join() for thread in threads]

@@ -13,7 +13,7 @@ class CloudWatchManager:
     def get_logs(self, log_group, query_string):
         start_query_response = self.client.start_query(
             logGroupName=log_group,
-            startTime=self._current_time - 12000,
+            startTime=self._current_time - 300,
             endTime=self._current_time,
             queryString=query_string
         )
