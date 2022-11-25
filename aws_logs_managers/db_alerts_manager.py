@@ -11,20 +11,19 @@ class DbAlertsManager(AwsLogManager):
             | parse @message "* * *:*:*:[*]:*:*" as date, time, timezone, ipaddress, dbuser, pid, type, text
             | display date, time, timezone, ipaddress, dbuser, pid, type, text"""
         self.TITLE = "**DATABASE ERROR**"
+        self.errors = []
 
     def process_db_errors(self):
         database_logs = self.cloud_watch_manager.get_logs(self.LOG_GROUP, self.QUERY_STRING)
-        errors = self._find_errors(database_logs)
-        self.discord_manager.send_discord_messages(errors, self.DISCORD_LINK)
+        self._find_errors(database_logs)
+        self.discord_manager.send_discord_messages(self.errors, self.DISCORD_LINK)
 
     def _find_errors(self, database_logs: dict):
         if database_logs.get('results'):
-            errors = []
             for log in database_logs['results']:
                 if self._check_message_type(log[6]['value']):
                     description = self._build_description(log)
-                    errors.append(self.discord_manager.prepare_discord_message(self.TITLE, description))
-            return errors
+                    self.errors.append(self.discord_manager.prepare_discord_message(self.TITLE, description))
 
     @staticmethod
     def _check_message_type(type):
