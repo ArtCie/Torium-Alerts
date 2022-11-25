@@ -23,3 +23,9 @@ class CloudWatchManager:
             time.sleep(2)
             response = self.client.get_query_results(queryId=query_id)
         return response
+
+    def get_lambda_log_groups(self):
+        return self.client.describe_log_groups(
+                logGroupNamePrefix="/aws/lambda/",
+                limit=50
+            )['logGroups']
