@@ -5,13 +5,13 @@ import urllib3
 
 class DiscordManager:
     @staticmethod
-    def prepare_discord_message(title, description):
+    def prepare_discord_message(title, description, color=14177041):
         return {
             "embeds": [
                 {
                     "title": title,
                     "description": description,
-                    "color": 14177041
+                    "color": color
                 }
             ]
         }
