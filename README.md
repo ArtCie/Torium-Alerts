@@ -1,6 +1,6 @@
 # Torium-Alerts
 
-### General description of project can be found here:
+### General project description can be found here:
 [TORIUM-Torium-generalinfo-280123-0718.pdf](https://github.com/ArtCie/Torium-Alerts/files/10526562/TORIUM-Torium-generalinfo-280123-0718.pdf)
 
 This repository consist of external tool built for managing Torium Backend architecture. Torium-Alerts is a Python base Lambda function which is execute by AWS EventBridge event each 5 minutes. System goes through Cloud resources and filter them for any error messages:
