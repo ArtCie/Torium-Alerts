@@ -17,3 +17,9 @@ Basic architecture flow:
 <img width="636" alt="Screenshot 2023-01-28 at 08 33 19" src="https://user-images.githubusercontent.com/72509444/215253417-2bb02246-ec32-46d5-97a7-432c012b1fe8.png">
 
 Project requirements:
+
+```
+boto3==1.26.14
+requests==2.24.0
+urllib3==1.25.9
+```
